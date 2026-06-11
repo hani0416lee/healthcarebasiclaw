@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>보건의료기본법 퀴즈</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #222831;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #3b6ea8;
+      --accent-dark: #28527f;
+      --correct-bg: #e8f5ed;
+      --correct: #166534;
+      --wrong-bg: #fdecec;
+      --wrong: #991b1b;
+      --neutral-bg: #eef2f7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1f3f5f, #3b6ea8);
+      color: white;
+      padding: 32px 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      letter-spacing: -0.04em;
+    }
+
+    header p {
+      margin: 0;
+      color: rgba(255,255,255,.86);
+      font-size: 0.98rem;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 24px auto 60px;
+      padding: 0 16px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .scorebox {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .scorebox strong { color: var(--text); }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      transition: transform .08s ease, background .12s ease;
+    }
+
+    button:hover { background: var(--accent-dark); }
+    button:active { transform: translateY(1px); }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .secondary:hover { background: #d1d5db; }
+
+    .question-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .qtop {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .qnum {
+      color: var(--accent-dark);
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .lawtag {
+      background: var(--neutral-bg);
+      color: #334155;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .question {
+      font-size: 1.08rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      margin: 0 0 14px;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      padding: 12px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .option:hover { background: #f8fafc; }
+    .option.correct {
+      background: var(--correct-bg);
+      border-color: #86efac;
+      color: var(--correct);
+    }
+    .option.wrong {
+      background: var(--wrong-bg);
+      border-color: #fca5a5;
+      color: var(--wrong);
+    }
+    .option:disabled { cursor: default; opacity: 1; }
+
+    .feedback {
+      display: none;
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border-left: 5px solid;
+      background: #f8fafc;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.correct { border-color: var(--correct); background: var(--correct-bg); }
+    .feedback.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+
+    .feedback-title {
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .explain {
+      margin: 4px 0 6px;
+    }
+
+    .ref {
+      color: #344054;
+      font-size: 0.92rem;
+      font-weight: 650;
+    }
+
+    .result {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+      display: none;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .result.show { display: block; }
+    .result h2 { margin: 0 0 8px; }
+
+    footer {
+      max-width: 960px;
+      margin: 0 auto 30px;
+      padding: 0 16px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 640px) {
+      .toolbar { position: static; }
+      .qtop { flex-direction: column; gap: 4px; }
+      .lawtag { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>보건의료기본법 암기 퀴즈</h1>
+    <p>보건의료기본법 및 보건의료기본법 시행령 기반 30문항 · 선택 즉시 채점</p>
+  </header>
+
+  <main>
+    <section class="toolbar" aria-label="퀴즈 진행 현황">
+      <div class="scorebox">
+        <span>풀이: <strong id="answeredCount">0</strong>/30</span>
+        <span>정답: <strong id="correctCount">0</strong></span>
+        <span>정답률: <strong id="accuracy">0%</strong></span>
+      </div>
+      <div>
+        <button class="secondary" onclick="resetQuiz()">다시 풀기</button>
+      </div>
+    </section>
+
+    <section id="result" class="result">
+      <h2>최종 결과</h2>
+      <p id="resultText"></p>
+    </section>
+
+    <section id="quiz"></section>
+  </main>
+
+  <footer>
+    출처: 보건의료기본법[법률 제21105호, 시행 2026. 5. 12.] 및 보건의료기본법 시행령[대통령령 제36117호, 시행 2026. 2. 27.]. 교육용 초안이므로 실제 시험 운영 전 조문 대조가 필요합니다.
+  </footer>
+
+  <script>
+    const questions = [
+      {
+        q: "보건의료기본법의 목적에 포함되지 않는 것은?",
+        options: ["보건의료에 관한 국민의 권리ㆍ의무 규정", "국가 및 지방자치단체의 책임 규정", "보건의료 수요와 공급에 관한 기본사항 규정", "개별 의료기관의 진료비 산정 기준 규정"],
+        answer: 3,
+        source: "보건의료기본법 제1조",
+        explain: "보건의료기본법은 보건의료의 발전과 국민의 보건 및 복지 증진에 이바지함을 목적으로 하며, 개별 의료기관 진료비 산정 기준을 직접 규정하는 조항은 아니다."
+      },
+      {
+        q: "보건의료기본법의 기본 이념으로 옳은 것은?",
+        options: ["보건의료의 형평과 효율의 조화", "민간 의료기관의 수익성 우선", "국가 중심의 의료서비스 독점", "응급의료만을 중심으로 한 체계 구축"],
+        answer: 0,
+        source: "보건의료기본법 제2조",
+        explain: "기본 이념은 인간의 존엄과 가치, 행복추구, 건강한 삶을 위한 제도와 여건 조성, 보건의료의 형평과 효율의 조화를 포함한다."
+      },
+      {
+        q: "'보건의료'의 정의로 가장 적절한 것은?",
+        options: ["의료인이 의료기관 안에서만 행하는 치료행위", "국민의 건강을 보호ㆍ증진하기 위해 국가ㆍ지방자치단체ㆍ보건의료기관 또는 보건의료인 등이 행하는 모든 활동", "환자의 진료기록을 전산화하는 활동", "의약품의 제조와 판매만을 의미하는 활동"],
+        answer: 1,
+        source: "보건의료기본법 제3조제1호",
+        explain: "보건의료는 국민 건강의 보호ㆍ증진을 위한 국가, 지방자치단체, 보건의료기관, 보건의료인 등의 모든 활동을 말한다."
+      },
+      {
+        q: "'보건의료서비스'란 무엇인가?",
+        options: ["보건의료인이 국민의 건강을 보호ㆍ증진하기 위하여 행하는 모든 활동", "보건복지부가 수립하는 5년 단위 계획", "국가가 제공하는 무상 의료급여", "공공보건의료기관에서만 제공하는 진료"],
+        answer: 0,
+        source: "보건의료기본법 제3조제2호",
+        explain: "보건의료서비스는 보건의료인이 국민 건강 보호ㆍ증진을 위해 행하는 모든 활동이다."
+      },
+      {
+        q: "보건의료기본법상 '보건의료기관'에 포함되는 것으로 명시된 것은?",
+        options: ["보건기관, 의료기관, 약국 등", "학교와 도서관", "보험회사와 금융기관", "체육시설과 숙박시설"],
+        answer: 0,
+        source: "보건의료기본법 제3조제4호",
+        explain: "보건의료기관은 보건기관, 의료기관, 약국, 그 밖에 대통령령으로 정하는 기관을 말한다."
+      },
+      {
+        q: "보건의료인의 책임으로 옳지 않은 것은?",
+        options: ["양질의 적정한 보건의료서비스 제공을 위해 노력한다", "정당한 이유 없이 보건의료서비스 제공 요구를 거부하지 못한다", "필요 시 다른 보건의료기관에 소개하도록 노력한다", "환자가 요구하면 모든 치료방법을 설명 없이 시행할 수 있다"],
+        answer: 3,
+        source: "보건의료기본법 제5조",
+        explain: "보건의료인은 양질의 적정 서비스 제공, 정당한 이유 없는 거부 금지, 필요 시 타 기관 소개와 자료 제공 노력, 관리대상 질병 신고 등의 책임이 있다."
+      },
+      {
+        q: "모든 환자가 가지는 권리로 옳은 것은?",
+        options: ["자신의 건강보호와 증진을 위하여 적절한 보건의료서비스를 받을 권리", "의료기관의 경영방침을 결정할 권리", "보건의료정책심의위원회 위원을 임명할 권리", "진료비를 임의로 결정할 권리"],
+        answer: 0,
+        source: "보건의료기본법 제6조제1항",
+        explain: "모든 환자는 자신의 건강보호와 증진을 위하여 적절한 보건의료서비스를 받을 권리를 가진다."
+      },
+      {
+        q: "국가와 지방자치단체가 보건의료정책을 수립ㆍ시행할 때 국민의 의견을 수렴해야 하는 경우는?",
+        options: ["국민의 권리ㆍ의무 등 국민생활에 중대한 영향을 미치는 정책을 수립ㆍ시행하려는 경우", "모든 의료기관의 직원 채용 시", "개별 환자의 치료계획을 정할 때", "의료기관의 내부 회계처리 시"],
+        answer: 0,
+        source: "보건의료기본법 제8조",
+        explain: "국민생활에 중대한 영향을 미치는 보건의료정책을 수립ㆍ시행하려면 이해관계인 등 국민 의견을 수렴하여야 한다."
+      },
+      {
+        q: "모든 국민의 건강권에 관한 설명으로 옳지 않은 것은?",
+        options: ["자신과 가족의 건강에 관하여 국가의 보호를 받을 권리를 가진다", "성별, 나이, 종교, 사회적 신분 또는 경제적 사정 등을 이유로 건강권을 침해받지 않는다", "건강권은 보건의료기관 종사자에게만 인정된다", "건강권은 법 또는 다른 법률에서 정하는 바에 따른다"],
+        answer: 2,
+        source: "보건의료기본법 제10조",
+        explain: "건강권은 모든 국민에게 인정되는 권리이며, 특정 직역에 한정되지 않는다."
+      },
+      {
+        q: "보건의료서비스에 관한 자기결정권의 내용으로 옳은 것은?",
+        options: ["치료 방법 등에 관하여 충분한 설명을 들은 후 동의 여부를 결정할 권리", "보건복지부장관을 임명할 권리", "의료기관의 개설 허가를 결정할 권리", "타인의 진료기록을 열람할 권리"],
+        answer: 0,
+        source: "보건의료기본법 제12조",
+        explain: "모든 국민은 치료 방법, 의학적 연구 대상 여부, 장기이식 여부 등에 대해 충분한 설명을 듣고 동의 여부를 결정할 권리를 가진다."
+      },
+      {
+        q: "보건의료에 관한 국민의 의무로 옳은 것은?",
+        options: ["자신과 가족의 건강을 보호ㆍ증진하기 위하여 노력한다", "건강에 위해한 정보를 자유롭게 유포할 수 있다", "보건의료인의 정당한 지도에 협조하지 않아도 된다", "건강보호 비용 부담 의무는 전혀 없다"],
+        answer: 0,
+        source: "보건의료기본법 제14조제1항",
+        explain: "모든 국민은 자신과 가족의 건강을 보호ㆍ증진하기 위하여 노력하고, 관계 법령에 따라 필요한 비용을 부담하여야 한다."
+      },
+      {
+        q: "보건의료발전계획은 몇 년마다 수립하여야 하는가?",
+        options: ["1년마다", "3년마다", "5년마다", "10년마다"],
+        answer: 2,
+        source: "보건의료기본법 제15조제1항",
+        explain: "보건복지부장관은 보건의료발전계획을 5년마다 수립하여야 한다."
+      },
+      {
+        q: "보건의료발전계획의 확정 절차로 옳은 것은?",
+        options: ["국무회의의 심의를 거쳐 확정한다", "시ㆍ도지사의 단독 결정으로 확정한다", "개별 의료기관장이 확정한다", "국민투표로만 확정한다"],
+        answer: 0,
+        source: "보건의료기본법 제15조제3항",
+        explain: "보건의료발전계획은 국무회의의 심의를 거쳐 확정한다."
+      },
+      {
+        q: "보건의료발전계획이 확정되면 소관 주요 시책의 추진방안을 매년 수립ㆍ시행하여야 하는 자는?",
+        options: ["보건복지부장관과 관계 중앙행정기관의 장", "국민건강보험공단 이사장만", "개별 병원장만", "약국 개설자만"],
+        answer: 0,
+        source: "보건의료기본법 제16조",
+        explain: "보건복지부장관과 관계 중앙행정기관의 장은 확정된 보건의료발전계획을 기초로 소관 주요 시책 추진방안을 매년 수립ㆍ시행하여야 한다."
+      },
+      {
+        q: "보건의료정책심의위원회는 누구 소속으로 두는가?",
+        options: ["보건복지부장관", "대통령", "국무총리", "시ㆍ도지사"],
+        answer: 0,
+        source: "보건의료기본법 제20조",
+        explain: "보건의료에 관한 주요 시책을 심의하기 위하여 보건복지부장관 소속으로 보건의료정책심의위원회를 둔다."
+      },
+      {
+        q: "보건의료정책심의위원회의 구성에 대한 설명으로 옳은 것은?",
+        options: ["위원장 1명을 포함한 25명 이내의 위원으로 구성한다", "위원장 1명을 포함한 100명 이상으로 구성한다", "공무원인 위원이 전체 위원의 전원이 되어야 한다", "위원장은 교육부장관으로 한다"],
+        answer: 0,
+        source: "보건의료기본법 제21조제1항ㆍ제2항",
+        explain: "위원회는 위원장 1명을 포함한 25명 이내로 구성하며, 위원장은 보건복지부장관이다."
+      },
+      {
+        q: "보건의료정책심의위원회의 심의사항에 해당하지 않는 것은?",
+        options: ["보건의료발전계획", "주요 보건의료제도의 개선", "주요 보건의료정책", "개별 환자의 입원 여부"],
+        answer: 3,
+        source: "보건의료기본법 제22조제1항",
+        explain: "위원회는 보건의료발전계획, 주요 제도 개선, 주요 정책, 국가 및 지방자치단체의 역할 등을 심의한다. 개별 환자 입원 여부는 해당하지 않는다."
+      },
+      {
+        q: "수급추계위원회가 설치되는 직종별 보건의료인력에 해당하지 않는 것은?",
+        options: ["의사ㆍ치과의사ㆍ한의사", "간호사", "약사 및 한약사", "요양기관 건물관리자"],
+        answer: 3,
+        source: "보건의료기본법 제23조의2제1항",
+        explain: "수급추계위원회는 의사ㆍ치과의사ㆍ한의사, 간호사, 약사 및 한약사, 의료기사 등 직종별로 둔다."
+      },
+      {
+        q: "수급추계위원회는 위원장 1명을 포함하여 몇 명 이내의 위원으로 구성하는가?",
+        options: ["10명 이내", "15명 이내", "25명 이내", "100명 이내"],
+        answer: 1,
+        source: "보건의료기본법 제23조의2제4항",
+        explain: "수급추계위원회는 위원장 1명을 포함하여 15명 이내의 위원으로 구성한다."
+      },
+      {
+        q: "보건의료인력 업무조정위원회의 존속기한은 언제까지인가?",
+        options: ["2027년 1월 1일까지", "2028년 12월 31일까지", "2030년 12월 31일까지", "기한 없이 영구 존속"],
+        answer: 2,
+        source: "보건의료기본법 제26조의2제11항",
+        explain: "업무조정위원회는 2030년 12월 31일까지 존속한다."
+      },
+      {
+        q: "업무조정위원회의 위원장에 대한 설명으로 옳은 것은?",
+        options: ["보건복지부장관이 지명하는 보건복지부차관이 된다", "교육부장관이 된다", "위원 중 최연장자가 된다", "대통령이 된다"],
+        answer: 0,
+        source: "보건의료기본법 제26조의2제4항",
+        explain: "업무조정위원회의 위원장은 보건복지부장관이 지명하는 보건복지부차관이 된다."
+      },
+      {
+        q: "보건의료의 제공 및 이용체계에 관한 설명으로 옳은 것은?",
+        options: ["보건의료자원이 지역적으로 고루 분포되어 공급이 균형 있게 이루어지도록 노력하여야 한다", "보건의료자원은 수도권에 집중되어야 한다", "국가는 보건의료의 이용체계에 관여할 수 없다", "민간 의료기관만 보건의료체계를 마련한다"],
+        answer: 0,
+        source: "보건의료기본법 제29조제1항",
+        explain: "국가와 지방자치단체는 보건의료자원이 지역적으로 고루 분포되고 보건의료서비스 공급이 균형 있게 이루어지도록 노력하여야 한다."
+      },
+      {
+        q: "응급의료체계 마련의 대상에 관한 설명으로 옳은 것은?",
+        options: ["모든 국민이며, 국내에 체류하고 있는 외국인을 포함한다", "대한민국 국적자만 해당한다", "공무원만 해당한다", "보험료를 납부한 사람만 해당한다"],
+        answer: 0,
+        source: "보건의료기본법 제30조",
+        explain: "국가와 지방자치단체는 모든 국민, 국내 체류 외국인을 포함하여 신속하고 적절한 응급의료서비스를 받을 수 있도록 응급의료체계를 마련하여야 한다."
+      },
+      {
+        q: "기후보건영향평가는 누가 5년마다 조사ㆍ평가하여 공표하는가?",
+        options: ["질병관리청장", "보건복지부장관", "시ㆍ도지사", "국민건강보험공단 이사장"],
+        answer: 0,
+        source: "보건의료기본법 제37조의3제1항",
+        explain: "질병관리청장은 기후변화가 국민건강에 미치는 영향을 5년마다 조사ㆍ평가하여 그 결과를 공표하고 정책수립의 기초자료로 활용하여야 한다."
+      },
+      {
+        q: "보건의료 실태조사는 원칙적으로 몇 년마다 실시하는가?",
+        options: ["매년", "2년마다", "5년마다", "10년마다"],
+        answer: 2,
+        source: "보건의료기본법 제55조제1항",
+        explain: "보건복지부장관은 보건의료 실태에 관한 전국적인 조사를 5년마다 실시하고 그 결과를 공표하여야 한다."
+      },
+      {
+        q: "보건의료발전계획이 확정된 경우 보건복지부장관의 통보 의무로 옳은 것은?",
+        options: ["지체 없이 관계 중앙행정기관의 장 및 시ㆍ도지사에게 통보하여야 한다", "1년 이내에 의료기관장에게만 통보한다", "국회에만 통보하면 된다", "통보 의무는 없다"],
+        answer: 0,
+        source: "보건의료기본법 시행령 제2조제1항",
+        explain: "보건복지부장관은 보건의료발전계획이 확정되면 지체 없이 관계 중앙행정기관의 장 및 시ㆍ도지사에게 통보하여야 한다."
+      },
+      {
+        q: "관계 중앙행정기관의 장은 소관 주요 시책 추진방안과 전년도 추진결과를 매년 언제까지 보건복지부장관에게 제출하여야 하는가?",
+        options: ["1월 말까지", "2월 말까지", "6월 말까지", "12월 말까지"],
+        answer: 1,
+        source: "보건의료기본법 시행령 제3조",
+        explain: "관계 중앙행정기관의 장은 해당 연도 소관 주요 시책 추진방안과 전년도 추진결과를 매년 2월 말까지 제출하여야 한다."
+      },
+      {
+        q: "보건의료정책심의위원회 회의의 의결 요건으로 옳은 것은?",
+        options: ["재적위원 과반수 출석, 출석위원 과반수 찬성", "재적위원 3분의 1 출석, 출석위원 전원 찬성", "위원장 단독 결정", "재적위원 전원 출석, 출석위원 3분의 2 찬성"],
+        answer: 0,
+        source: "보건의료기본법 시행령 제7조제2항",
+        explain: "위원회의 회의는 재적위원 과반수의 출석으로 개의하고, 출석위원 과반수의 찬성으로 의결한다."
+      },
+      {
+        q: "업무조정위원회 회의의 정기 개최 주기로 옳은 것은?",
+        options: ["매월", "분기별", "반기별", "매년"],
+        answer: 1,
+        source: "보건의료기본법 시행령 제13조의6제2항",
+        explain: "업무조정위원회의 회의는 분기별로 개최한다. 다만, 위원장이 필요하다고 인정하거나 재적위원 3분의 1 이상이 요구하는 경우에도 회의를 소집할 수 있다."
+      },
+      {
+        q: "업무조정위원회 분과위원회 중 '의사ㆍ치과의사ㆍ한의사ㆍ간호사ㆍ간호조무사와 연관된 직역별 의료행위 범위 등'을 검토하는 분과위원회는?",
+        options: ["운영 분과위원회", "의료행위 제1분과위원회", "약무ㆍ의료기기 분과위원회", "보건관리 분과위원회"],
+        answer: 1,
+        source: "보건의료기본법 시행령 제13조의8제1항제2호",
+        explain: "의료행위 제1분과위원회는 의사ㆍ치과의사ㆍ한의사ㆍ간호사ㆍ간호조무사와 연관된 직역별 의료행위 범위 등을 검토한다."
+      },
+      {
+        q: "시행령상 보건의료 실태조사 결과의 공개 기간으로 옳은 것은?",
+        options: ["보건복지부 인터넷 홈페이지에 10일 이상 공개", "보건복지부 인터넷 홈페이지에 30일 이상 공개", "보건복지부 인터넷 홈페이지에 60일 이상 공개", "공개하지 않는다"],
+        answer: 2,
+        source: "보건의료기본법 시행령 제14조제3항",
+        explain: "보건복지부장관은 보건의료 실태조사의 결과를 보건복지부 인터넷 홈페이지에 60일 이상 공개해야 한다."
+      }
+    ];
+
+    let answered = Array(questions.length).fill(false);
+    let correct = Array(questions.length).fill(false);
+
+    function renderQuiz() {
+      const quiz = document.getElementById('quiz');
+      quiz.innerHTML = questions.map((item, idx) => `
+        <article class="question-card" id="q${idx}">
+          <div class="qtop">
+            <div class="qnum">문항 ${idx + 1}</div>
+            <div class="lawtag">${item.source}</div>
+          </div>
+          <p class="question">${escapeHtml(item.q)}</p>
+          <div class="options">
+            ${item.options.map((opt, optIdx) => `
+              <button class="option" id="q${idx}o${optIdx}" onclick="checkAnswer(${idx}, ${optIdx})">${optIdx + 1}. ${escapeHtml(opt)}</button>
+            `).join('')}
+          </div>
+          <div class="feedback" id="fb${idx}"></div>
+        </article>
+      `).join('');
+    }
+
+    function checkAnswer(qIdx, selectedIdx) {
+      if (answered[qIdx]) return;
+
+      const item = questions[qIdx];
+      answered[qIdx] = true;
+      const isCorrect = selectedIdx === item.answer;
+      correct[qIdx] = isCorrect;
+
+      item.options.forEach((_, optIdx) => {
+        const btn = document.getElementById(`q${qIdx}o${optIdx}`);
+        btn.disabled = true;
+        if (optIdx === item.answer) btn.classList.add('correct');
+        if (optIdx === selectedIdx && !isCorrect) btn.classList.add('wrong');
+      });
+
+      const fb = document.getElementById(`fb${qIdx}`);
+      fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+      fb.innerHTML = `
+        <div class="feedback-title">${isCorrect ? '정답입니다.' : '오답입니다.'}</div>
+        <div class="explain">정답: <strong>${item.answer + 1}. ${escapeHtml(item.options[item.answer])}</strong></div>
+        <div class="explain">${escapeHtml(item.explain)}</div>
+        <div class="ref">근거: ${escapeHtml(item.source)}</div>
+      `;
+
+      updateScore();
+    }
+
+    function updateScore() {
+      const answeredCount = answered.filter(Boolean).length;
+      const correctCount = correct.filter(Boolean).length;
+      const accuracy = answeredCount ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById('answeredCount').textContent = answeredCount;
+      document.getElementById('correctCount').textContent = correctCount;
+      document.getElementById('accuracy').textContent = `${accuracy}%`;
+
+      if (answeredCount === questions.length) {
+        const finalAccuracy = Math.round((correctCount / questions.length) * 100);
+        const result = document.getElementById('result');
+        result.classList.add('show');
+        document.getElementById('resultText').innerHTML = `총 <strong>${questions.length}</strong>문항 중 <strong>${correctCount}</strong>문항 정답입니다. 최종 정답률은 <strong>${finalAccuracy}%</strong>입니다.`;
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function resetQuiz() {
+      answered = Array(questions.length).fill(false);
+      correct = Array(questions.length).fill(false);
+      document.getElementById('result').classList.remove('show');
+      renderQuiz();
+      updateScore();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    renderQuiz();
+    updateScore();
+  </script>
+</body>
+</html>
